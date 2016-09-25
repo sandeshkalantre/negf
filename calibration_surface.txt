@@ -1,0 +1,12 @@
+The calculate_surface function calculates the surface Green's function iteratively given the alpha and beta matrices as E.
+
+Optional Parameters:
+eta : this is the added infinitesimal parameter to ensure that we obtain the retarded Green's function, default value = 0.00001
+N : max number of iterationsi, default value = 10000
+eps : the accetable level of tolerance between two iterations, default value = 0.0001
+
+Notes:
+- Having a higher value of eta seems to speed up the iteration. But ideally to obtain the correct Green's function, eta must be small.
+
+The iteration does not seem to converge for values of E above the superconducting gap.
+
