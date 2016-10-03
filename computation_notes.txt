@@ -1,0 +1,1 @@
+Changing array type to np.complex128 has no effect on the accuracy of the computatation, atleast not while defining the arrays
