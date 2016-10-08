@@ -8,18 +8,18 @@ eta = 1e-8;
 
 %energies in eV
 t0 = 0.1;
-Delta = 0.008;
+Delta = 0.00008;
 kT = 0.002;
 V = 0.0001;
 
 phi = pi/2;
 
 Delta1 = Delta;
-alpha1 = [2*t0 Delta1; conj(Delta1) -2*t0];
+alpha1 = [2*t0+V Delta1; conj(Delta1) -2*t0-V];
 beta1 = -t0* [1 0; 0 -1];
 
 Delta2 = Delta * exp(1i*phi);
-alpha2 = [2*t0+V Delta2; conj(Delta2) -2*t0+V];
+alpha2 = [2*t0 Delta2; conj(Delta2) -2*t0];
 beta2 = -t0* [1 0; 0 -1];
 
 E = Delta*(-10:0.13:2);

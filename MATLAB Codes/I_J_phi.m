@@ -69,5 +69,5 @@ set(0,'DefaultTextInterpreter', 'latex');
 set(gca,'Fontsize',[24]);
 xlabel('$\phi$','FontSize',24);
 ylabel('$I_J$','FontSize',24);
-legend_handle = legend('$\Delta = 0.008$');
+legend_handle = legend(strcat('$\Delta = $ ',num2str(Delta)));
 set(legend_handle,'Interpreter','latex');
