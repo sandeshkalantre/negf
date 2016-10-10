@@ -1,4 +1,5 @@
-%NEGF calculation for I_J vs phi 
+%calculation of the Josephson current vs phase directly using the current
+%operator
 
 %tolerance for calculation of surface Green's function
 eps = 1e-4;
@@ -11,11 +12,14 @@ t0 = 0.1;
 Delta = 0.008;
 kT = 0.002;
 
-phi_vec = 0:0.1:2*pi;
+phi_vec = 2*pi*(0:0.05:1);
 I_phi = zeros(1,length(phi_vec));
 
-for jj = 1:length(phi_vec)
-    phi = phi_vec(jj);
+%tunelling 
+M = 0.0001 .* eye(2);
+
+for ii = 1:length(phi_vec)
+    phi = phi_vec(ii);
 
     Delta1 = Delta;
     alpha1 = [2*t0 Delta1; conj(Delta1) -2*t0];
@@ -25,10 +29,10 @@ for jj = 1:length(phi_vec)
     alpha2 = [2*t0 Delta2; conj(Delta2) -2*t0];
     beta2 = -t0* [1 0; 0 -1];
 
-    E = 4*t0*(0:0.13:1);
-    I_J = zeros(1,length(E));
-    for ii = 1:length(E)
-        EE = E(ii);
+    E = 4 * t0 *(0:0.01:1);
+    I_E = zeros(1,length(E));
+    for jj = 1:length(E)
+        EE = E(jj);
     
         %calculation of g iteratively
         g1 = inv(alpha1);
@@ -58,10 +62,17 @@ for jj = 1:length(phi_vec)
             g2 = 0.5 * (g2 + g2_last);
             g2_last = g2;
         end
-
-        I_J(ii) = 4 * real(g1(2,1)*g2(1,2) - g2(2,1)*g1(1,2)) * 1.0/(1 + exp(EE/kT));
+        
+        G_D = inv([inv(g1) -M;-M' inv(g2)]);
+        sigma1_corr = (1.0/(1 + exp(EE/kT))) * beta1' * (g1' - g1) * beta1;
+        sigma2_corr = (1.0/(1 + exp(EE/kT))) * beta2 * (g2' - g2) * beta2';
+        Sigma_D_corr = [sigma1_corr zeros(2,2);zeros(2,2) sigma2_corr];
+        G_corr = G_D * Sigma_D_corr * G_D';
+        
+        I_op = M * G_corr(3:4,1:2) - G_corr(1:2,3:4) * M;
+        I_E(jj) = trace(I_op);
     end
-    I_phi(jj) = sum(I_J);
+    I_phi(ii) = (sum(I_E));
 end
 
 plot(phi_vec,I_phi,'LineWidth',2)
@@ -71,3 +82,4 @@ xlabel('$\phi$','FontSize',16);
 ylabel('$I_J$','FontSize',16);
 legend_handle = legend({strcat('$\Delta = $ ',num2str(Delta))},'Location','Best');
 set(legend_handle,'Interpreter','latex');
+        
