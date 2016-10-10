@@ -10,17 +10,17 @@ eta = 1e-6;
 t0 = 0.1;
 Delta = 0.008;
 % fact = |Delta2|/|Delta1|
-fac = 2;
+fac = 1;
 
-kT = 0.00001;
+kT = 0.0001;
 phi = 0.2*pi;
 
-V_vec = 5 * Delta*(-1:0.005:1);
-I_V = zeros(1,length(V_vec));
+V_vec1 = 5 * Delta*(-1:0.01:1);
+I_V1 = zeros(1,length(V_vec1));
 mu = 0;
 
-for ii = 1:length(V_vec)
-    V = V_vec(ii);
+for ii = 1:length(V_vec1)
+    V = V_vec1(ii);
 
     Delta1 = Delta;
     alpha1 = [2*t0-mu Delta1; conj(Delta1) -2*t0+mu];
@@ -31,7 +31,7 @@ for ii = 1:length(V_vec)
     beta2 = t0* [1 0; 0 -1];
 
     E = 10*Delta*(-1:0.001:1);
-    I_E = zeros(1,length(E));
+    I_QP = zeros(1,length(E));
 
     for jj = 1:length(E)
         EE = E(jj);
@@ -76,9 +76,9 @@ for ii = 1:length(V_vec)
         %    DOS1(jj)=trace(a1);
         %    DOS2(jj)=trace(a2);
         %end
-        I_E(jj) = (a2(1,1) * a1(1,1) + a2(2,2)*a1(2,2)) * (1.0/(1 + exp((EE)/kT)) - 1.0/(1 + exp((EE+V)/kT)));
+        I_QP(jj) = (a2(1,1) * a1(1,1) + a2(2,2)*a1(2,2)) * (1.0/(1 + exp((EE)/kT)) - 1.0/(1 + exp((EE+V)/kT)));
     end
-    I_V(ii) = sum(I_E);
+    I_V(ii) = sum(I_QP);
 end
 
 
@@ -98,5 +98,5 @@ set(0,'DefaultTextInterpreter', 'latex');
 set(gca,'Fontsize',[16]);
 xlabel('$\frac{V}{\Delta}$','FontSize',24);
 ylabel('$I_{QP}$ (arb units)','FontSize',24);
-legend_handle = legend({strcat('$\phi = \ $',num2str(phi))},'Location','Best');
+legend_handle = legend({strcat('$\phi = \ $',num2str(phi))},'L0cation','Best');
 set(legend_handle,'Interpreter','latex');

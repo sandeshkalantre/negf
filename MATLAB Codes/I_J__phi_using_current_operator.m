@@ -36,12 +36,14 @@ for ii = 1:length(phi_vec)
         EE = E(jj);
     
         %calculation of g iteratively
-        g1 = inv(alpha1);
-        g1_last = inv(alpha1);
+        if jj == 1
+            g1 = inv(alpha1);
+            g1_last = inv(alpha1);
+        end
         err = 1;
         for kk = 1:1000
             g1 = inv((EE + 1i*eta)*eye(2) - alpha1 - beta1'*g1*beta1);
-            err = sum(sum(abs(g1_last - g1)))/sum(sum(abs(g1) + abs(g1_last)));
+            err = norm(g1 - g1_last,1)/norm(g1,1);
             if  err < eps
                 break
             end
@@ -50,8 +52,10 @@ for ii = 1:length(phi_vec)
             g1_last = g1;
         end
     
-        g2 = inv(alpha2);
-        g2_last = inv(alpha2);
+        if jj == 1
+            g2 = inv(alpha2);
+            g2_last = inv(alpha2);
+        end
         err = 1;
         for kk = 1:1000
             g2 = inv((EE + 1i*eta)*eye(2) - alpha2 - beta2'*g2*beta2);
