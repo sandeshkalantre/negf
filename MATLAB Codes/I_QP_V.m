@@ -12,7 +12,8 @@ kT = 0.0002;
 phi = 0.3*pi;
 mu = 2*t0;
 
-V_vec = 0.03*(-1:0.05:1);
+%since we want to see V/Delta 
+V_vec = 5 * Delta *(-1:0.05:1);
 I_V = zeros(1,length(V_vec));
 
 for jj = 1:length(V_vec)
@@ -26,7 +27,8 @@ for jj = 1:length(V_vec)
     alpha2 = [2*t0-mu Delta2; conj(Delta2) -2*t0+mu];
     beta2 = -t0* [1 0; 0 -1];
 
-    E = 0.03*(-1:0.05:1);
+    %assuming Fermi level at 2*t0
+    E = 2*t0*(-1:0.02:1);
     I_QP = zeros(1,length(E));
     a1_vec= zeros(1,length(E));
     a2_vec= zeros(1,length(E));
@@ -84,5 +86,5 @@ set(0,'DefaultTextInterpreter', 'latex');
 set(gca,'Fontsize',[12]);
 xlabel('$\frac{V}{\Delta}$','FontSize',24);
 ylabel('$I_{QP}$','FontSize',24);
-legend_handle = legend({'$\phi = \frac{\pi}{2}$'},'FontSize',24,'Location','Best');
+legend_handle = legend({strcat('$\Delta = $ ',num2str(Delta),' $kT = $',num2str(kT))},'FontSize',24,'Location','Best');
 set(legend_handle,'Interpreter','latex');
