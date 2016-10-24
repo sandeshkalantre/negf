@@ -1,5 +1,6 @@
 %calculation of the Josephson current vs phase directly using the current
 %operator
+%device point added
 
 %tolerance for calculation of surface Green's function
 eps = 1e-4;
@@ -16,8 +17,14 @@ phi_vec = 2*pi*(0:0.05:1);
 I_phi = zeros(2,length(phi_vec));
 
 %tunelling
-M0 = 0.001;
-M = M0 .* [1 0; 0 -1];
+M0 = 0.1;
+M = M0 .* [1 0; 0 1];
+
+%device Hamiltonian
+alpha = [2*t0 0; 0 -2*t0];
+beta1 = -t0* [1 0; 0 -1];
+H_D = alpha; 
+
 
 for ii = 1:length(phi_vec)
     phi = phi_vec(ii);
@@ -68,6 +75,23 @@ for ii = 1:length(phi_vec)
             g2_last = g2;
         end
         
+        g_D = inv((EE + 1i*eta) .* eye(2) - H_D);
+        G_D = ...
+        inv([inv(g1) -M zeros(2,2);-M' inv(g_D) -M;zeros(2,2) -M' inv(g2)]);
+        sigma1_corr = (1.0/(1 + exp(EE/kT))) * beta1' * (g1' - g1) * beta1;
+        sigma2_corr = (1.0/(1 + exp(EE/kT))) * beta2 * (g2' - g2) * beta2';
+        Sigma_D_corr = ...
+        [sigma1_corr zeros(2,2) zeros(2,2); 
+         zeros(2,2) zeros(2,2) zeros(2,2); 
+         zeros(2,2) zeros(2,2) sigma2_corr];
+     
+        G_corr = G_D * Sigma_D_corr * G_D';
+        
+        I_op = M * G_corr(3:4,1:2) - G_corr(1:2,3:4) * M;
+        I_E(1,jj) = I_op(1,1) - I_op(2,2);    
+        
+        %calculation without device point, symbols resued, be careful in
+        %further use
         G_D = inv([inv(g1) -M;-M' inv(g2)]);
         sigma1_corr = (1.0/(1 + exp(EE/kT))) * beta1' * (g1' - g1) * beta1;
         sigma2_corr = (1.0/(1 + exp(EE/kT))) * beta2 * (g2' - g2) * beta2';
@@ -75,24 +99,22 @@ for ii = 1:length(phi_vec)
         G_corr = G_D * Sigma_D_corr * G_D';
         
         I_op = M * G_corr(3:4,1:2) - G_corr(1:2,3:4) * M;
-        I_E(1,jj) = I_op(1,1) - I_op(2,2);
+        I_E(2,jj) = I_op(1,1) - I_op(2,2);
         
-        %Just to check with the direct formula
-        I_E(2,jj) = 4 * M0 * M0 * real(g1(2,1)*g2(1,2) - g2(2,1)*g1(1,2)) * 1.0/(1 + exp(EE/kT));
     end
-    I_phi(1,ii) = (sum(I_E(1,:)));
-    I_phi(2,ii) = (sum(I_E(2,:)));
+    I_phi(1,ii) = sum(I_E(1,:));
+    I_phi(2,ii) = sum(I_E(2,:));
 end
 
 plot(phi_vec/(2*pi),I_phi(1,:),'LineWidth',2)
 hold on;
-plot(phi_vec/(2*pi),I_phi(2,:),'LineWidth',2)
+%plot(phi_vec/(2*pi),I_phi(2,:),'LineWidth',2)
 hold off;
 set(0,'DefaultTextInterpreter', 'latex');
 set(gca,'Fontsize',[16]);
 xlabel('$\frac{\phi}{2\pi}$','FontSize',16);
 ylabel('$I_J$ (arb units)','FontSize',16);
-title(strcat('$\Delta = \ $ ',num2str(Delta)));
-legend_handle = legend({'Current Operator','Direct Formula'},'Location','NorthEast');
+title(strcat('$M = \ $ ',num2str(M0)));
+legend_handle = legend({'With Device Point','Without Device Point'},'Location','NorthEast');
 set(legend_handle,'Interpreter','latex');
         
